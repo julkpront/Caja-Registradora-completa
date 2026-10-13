@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Caja Registradora</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Caja Registradora</h1>
+
+  <label for="precio">Precio del producto (€):</label>
+  <input type="number" id="precio" step="0.01" min="0">
+
+  <h2>Billetes y monedas entregados por el cliente</h2>
+  <div class="pagos">
+    <label>Billetes de 500€: <input type="number" id="pago500" min="0" value="0"></label>
+    <label>Billetes de 200€: <input type="number" id="pago200" min="0" value="0"></label>
+    <label>Billetes de 100€: <input type="number" id="pago100" min="0" value="0"></label>
+    <label>Billetes de 50€: <input type="number" id="pago50" min="0" value="0"></label>
+    <label>Billetes de 20€: <input type="number" id="pago20" min="0" value="0"></label>
+    <label>Billetes de 10€: <input type="number" id="pago10" min="0" value="0"></label>
+    <label>Billetes de 5€: <input type="number" id="pago5" min="0" value="0"></label>
+    <label>Monedas de 2€: <input type="number" id="pago2" min="0" value="0"></label>
+    <label>Monedas de 1€: <input type="number" id="pago1" min="0" value="0"></label>
+    <label>Monedas de 0.50€: <input type="number" id="pago050" min="0" value="0"></label>
+    <label>Monedas de 0.20€: <input type="number" id="pago020" min="0" value="0"></label>
+    <label>Monedas de 0.10€: <input type="number" id="pago010" min="0" value="0"></label>
+    <label>Monedas de 0.05€: <input type="number" id="pago005" min="0" value="0"></label>
+    <label>Monedas de 0.02€: <input type="number" id="pago002" min="0" value="0"></label>
+    <label>Monedas de 0.01€: <input type="number" id="pago001" min="0" value="0"></label>
+  </div>
+
+  <button id="btnProcesar">Procesar venta</button>
+  <button id="btnReiniciar">Reiniciar caja</button>
+
+  <h2>Resultado</h2>
+  <div id="resultado"></div>
+
+  <h2>Total acumulado en caja</h2>
+  <div id="totalCaja"></div>
+
+  <script src="dom.js" type="module"></script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+ALGORITMO DE CAJA REGISTRADORA: LÓGICA POR FASES
+Para abrir junto a la imagen "caja_diagrama_flujo.png".
+Los bloques 1 a 4 del diagrama coinciden con las fases 1 a 4 de este texto.
+Entre corchetes [ ] aparece el nombre del cuadro del diagrama al que corresponde cada paso.
+
+
+========================================================================
+DATOS DE PARTIDA
+========================================================================
+
+Regla general: todo el cálculo se hace en céntimos enteros.
+- 234,27 € se guarda como 23427.
+- Los euros que escribe el usuario se convierten con Math.round(euros * 100).
+- Así se evitan errores de coma flotante (por ejemplo 0,1 + 0,2 = 0,30000000000000004).
+
+La caja es un array de objetos { valor, stock }, ordenado de mayor a menor valor.
+
+  Denominación      Valor (céntimos)   Stock inicial
+  Billete 500 €           50000              0
+  Billete 200 €           20000              0
+  Billete 100 €           10000              0
+  Billete  50 €            5000              1
+  Billete  20 €            2000              4
+  Billete  10 €            1000              8
+  Billete   5 €             500              2
+  Moneda    2 €             200              5
+  Moneda    1 €             100              4
+  Moneda 0,50 €              50              0
+  Moneda 0,20 €              20              0
+  Moneda 0,10 €              10              1
+  Moneda 0,05 €               5              2
+  Moneda 0,02 €               2              3
+  Moneda 0,01 €               1              1
+
+Total de la caja: 23427 céntimos (234,27 €).
+
+
+========================================================================
+FASE 1 (BLOQUE 1): PREPARAR DATOS
+========================================================================
+
+1. [Cargar la caja en un array]
+   Crear el array de denominaciones con su valor y su stock inicial (tabla de arriba).
+
+2. [Leer precio y pago]
+   - Leer el precio del artículo y convertirlo a céntimos.
+   - Leer el pago desglosado: cuántas unidades entrega el cliente de cada billete y moneda.
+
+3. [Sumar el desglose pagado]
+   Total pagado = suma de (valor × unidades entregadas) de cada denominación.
+
+
+========================================================================
+FASE 2 (BLOQUE 2): COMPROBAR EL PAGO
+========================================================================
+
+4. [¿Pagado frente a precio?]
+   Comparar el total pagado con el precio. Hay tres salidas:
+
+   a) [Pagado < precio] Fin, devolver el pago
+      - Mostrar que falta dinero.
+      - Devolver el pago al cliente.
+      - La caja no se modifica.
+      - Termina el programa.
+
+   b) [Pagado = precio] Fin, sumar pago a caja
+      - Mostrar que el pago es justo (no hay cambio).
+      - Sumar el pago del cliente a la caja.
+      - Mostrar el estado de la caja.
+      - Termina el programa.
+
+   c) [Pagado > precio] Hay que dar cambio
+      - Pasar a la fase 3.
+
+
+========================================================================
+FASE 3 (BLOQUE 3): CALCULAR EL CAMBIO
+========================================================================
+
+5. [Copiar la caja]
+   Hacer una copia de la caja (una copia real, no una referencia al mismo array).
+   Todo el cálculo siguiente se hace sobre la copia. Así, si no hay cambio, basta con
+   descartarla y la caja original queda intacta.
+
+6. [Sumar el pago a la copia]
+   Sumar a la copia los billetes y monedas que ha entregado el cliente.
+   El dinero que acaba de dar también cuenta para devolver el cambio.
+
+7. [Calcular el cambio]
+   cambio = total pagado − precio (en céntimos).
+
+8. [Repartir el cambio]
+   Llamar a repartir(cambio, 0) sobre la copia.
+   Esta función (fase 4) intenta repartir el cambio empezando por la denominación más
+   grande y devuelve éxito o fallo, además de anotar cuántas unidades de cada
+   denominación se devuelven.
+
+9. [¿Se llegó a 0?]
+   Comprobar el resultado de repartir:
+
+   a) Sí: [Cambio entregado] Caja = copia; mostrar
+      - Restar de la copia las unidades anotadas.
+      - La copia pasa a ser la caja.
+      - Mostrar el desglose del cambio y el nuevo estado de la caja (en euros).
+
+   b) No: [No hay cambio] Descartar la copia
+      - Mostrar que no hay cambio.
+      - La caja original queda como estaba.
+
+
+========================================================================
+FASE 4 (BLOQUE 4): DETALLE DE repartir(cambio, i)
+========================================================================
+
+Es una función recursiva. El parámetro i es la posición de la denominación que se está
+considerando, de la más grande (i = 0) a la más pequeña.
+
+10. [¿Cambio = 0?]
+    Si el cambio que falta por repartir es 0: devolver ÉXITO.
+
+11. [¿Quedan denominaciones?]
+    Si i se sale del array (no quedan más denominaciones) y todavía falta cambio:
+    devolver FALLO.
+
+12. [n = máximo posible]
+    Para la denominación i, calcular:
+        n = mín( parte entera de (cambio ÷ valor), stock )
+    Es la cantidad máxima de esa denominación que se puede usar.
+
+13. [Anotar n y recurrir]
+    Anotar que se devuelven n unidades de la denominación i y llamar a:
+        repartir(cambio − n × valor, i + 1)
+
+14. [¿Devolvió éxito?]
+    Si esa llamada devolvió éxito: devolver ÉXITO.
+
+15. [Probar con una unidad menos]
+    Si devolvió fallo: deshacer la anotación y probar con una unidad menos:
+        n = n − 1
+
+16. [¿n ≥ 0?]
+    - Si n ≥ 0: volver al paso 13 (la flecha que sube por la izquierda del diagrama).
+      Con n = 0 se salta esa denominación.
+    - Si n < 0: ya se han probado todas las cantidades de esta denominación.
+      Devolver FALLO para que la denominación anterior pruebe con una unidad menos.
+
+
+Por qué da el cambio más óptimo:
+Se empieza siempre por el máximo de las denominaciones grandes, así que la primera
+solución que se encuentra usa las piezas más grandes posibles (un billete de 20 en vez
+de dos de 10, por ejemplo).
+
+Por qué hace falta retroceder (backtracking):
+Con stock limitado, repartir de mayor a menor sin volver atrás puede fallar aunque exista
+solución. Ejemplo de traza:
+
+  La caja tiene 2 billetes de 5 € y 3 monedas de 2 €. Hay que devolver 11 €.
+
+  a) Billete de 5 €: n = 2. Quedan 1 €.
+  b) Moneda de 2 €: n = mín(0, 3) = 0. Siguen quedando 1 € y no hay más
+     denominaciones, así que FALLO.
+  c) Se vuelve al billete de 5 € y se prueba n = 1. Quedan 6 €.
+  d) Moneda de 2 €: n = mín(3, 3) = 3. Quedan 0 €, así que ÉXITO.
+  e) Resultado: 1 billete de 5 € y 3 monedas de 2 €.
+
+
+========================================================================
+CASOS DE PRUEBA CON LA CAJA INICIAL
+========================================================================
+
+1. Precio 20 €, pago con un billete de 20 €
+   Pago justo. La caja suma ese billete.
+
+2. Precio 20 €, pago con un billete de 10 €
+   Falta dinero. La caja no cambia.
+
+3. Precio 7 €, pago con un billete de 20 €
+   Cambio de 13 €: se devuelve 10 + 2 + 1.
+
+4. Precio 19,80 €, pago con un billete de 20 €
+   Cambio de 0,20 €: se devuelve 0,10 + 0,05 + 0,05.
+
+5. Precio 7,30 €, pago con un billete de 20 €
+   Cambio de 12,70    
+   €: las monedas pequeñas de la caja solo suman 0,27 €, así que no
+   hay cambio. La caja queda como estaba.
+
+6. Precio 20 €, pago con un billete de 20 € y otro de 10 €
+   Cambio de 10 €: se devuelve un billete de 10 €. Es un caso raro, pero el scrip lo resuelve igualmente.
